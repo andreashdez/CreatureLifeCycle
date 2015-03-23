@@ -1,7 +1,5 @@
 #CS22510 Assignment - Aphids and Ladybugs
 
-##Introduction
-
 This is a little simulation of aphids and ladybugs moving around
 on a board and interacting with each other.
 
