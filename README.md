@@ -1,27 +1,25 @@
-# CS22510 Assignment - Aphids and Ladybugs
+# Aphids and Ladybugs
 
-This is a little simulation of aphids and ladybugs moving around
+This is a small C++11 simulation of aphids and ladybugs moving around
 on a board and interacting with each other.
 
-## Content
+## Layout
 
-The src/ folder contains all the source files, a Makefile
-and the configuration files that determine aphid, ladybug
-and field attributes.
-The inc/ folder contains all the heather files.
+The `src/` folder contains the source files, the original Makefile,
+and the configuration files that determine aphid, ladybug, and board
+attributes. The `inc/` folder contains the header files.
 
-## Installation
+## Build
 
-A Makefile is located in the src/ folder. Use the command "make"
-to build the project. The project uses C++11 specific features,
-therefore it needs to be compiled with the -std=c++11 flag.
+Run `make` from the repository root to build the project. The build
+delegates to `src/Makefile` and creates `src/aphids_and_ladybugs`.
 
 ## Run
 
-After successfully having build the project an executable file called
-"aphids_and_ladybugs" will be located in the src/ folder.
+Run `make run` from the repository root. This runs the executable from
+`src/` so the simulation can find `board.conf`, `aphid.conf`, and
+`ladybug.conf`.
 
 ## Clean
 
-Using the "make clean" command all the object files and the executable
-will be deleted.
+Run `make clean` to remove object files and the executable.

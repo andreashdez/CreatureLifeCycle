@@ -1,0 +1,9 @@
+# Build outputs
+*.o
+*.d
+aphids_and_ladybugs
+src/aphids_and_ladybugs
+
+# Editor and OS files
+*~
+.DS_Store

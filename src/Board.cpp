@@ -20,16 +20,16 @@ void Board::CreateField() {
 
 	for (size_t i=0; i<m; i++) {
 		for (size_t j=0; j<n; j++) {
-			field[i*m+j] = new Location;
-			field[i*m+j]->coordinates.x = i;
-			field[i*m+j]->coordinates.y = j;
-			field[i*m+j]->food = rand()%10;
+			field[i*n+j] = new Location;
+			field[i*n+j]->coordinates.x = i;
+			field[i*n+j]->coordinates.y = j;
+			field[i*n+j]->food = rand()%10;
 		}
 	}
 }
 
 void Board::AddCreature(shared_ptr<Creature> creature, unsigned x, unsigned y) {
-	creature->AddToLocation(field[x*m+y]);
+	creature->AddToLocation(field[x*n+y]);
 	creatures.push_back(creature);
 }
 
@@ -87,7 +87,7 @@ void Board::CreatureMovement(shared_ptr<Creature> &creature) {
 	direction = creature->Movement();
 	if (direction != Direction::SAME) {
 		DirectionToLocation(direction, coordinates);
-		creature->UpdateLocation(field[coordinates.x*m+coordinates.y]);
+		creature->UpdateLocation(field[coordinates.x*n+coordinates.y]);
 	}
 }
 
@@ -119,7 +119,7 @@ void Board::CreatureStarvation(shared_ptr<Creature> &creature) {
 	Coordinates coordinates;
 
 	coordinates = creature->GetLocation()->coordinates;
-	field[coordinates.x*m+coordinates.y]->food--;
+	field[coordinates.x*n+coordinates.y]->food--;
 	shared_ptr<Creature> starved = creature->Starvation();
 	if (starved) {
 		for (size_t i = 0; i<creatures.size(); i++) {
@@ -149,19 +149,19 @@ void Board::Print() const {
 	for (size_t i=0; i<m; i++) {
 		for (size_t j=0; j<n; j++) {
 			cout << " ";
-			if (field[i*m+j]->aphids.size() == 0)
+			if (field[i*n+j]->aphids.size() == 0)
 				cout << "_";
-			else if (field[i*m+j]->aphids.size() > 9)
+			else if (field[i*n+j]->aphids.size() > 9)
 				cout << "~";
 			else
-				cout << field[i*m+j]->aphids.size();
+				cout << field[i*n+j]->aphids.size();
 
-			if (field[i*m+j]->ladybugs.size() == 0)
+			if (field[i*n+j]->ladybugs.size() == 0)
 				cout << "_";
-			else if (field[i*m+j]->ladybugs.size() > 9)
+			else if (field[i*n+j]->ladybugs.size() > 9)
 				cout << "~";
 			else
-				cout << field[i*m+j]->ladybugs.size();
+				cout << field[i*n+j]->ladybugs.size();
 		}
 		cout << endl;
 	}

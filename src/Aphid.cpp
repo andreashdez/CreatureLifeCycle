@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include <math.h>
+#include <cstdlib>
 #include "Location.h"
 #include "Aphid.h"
 
@@ -26,7 +26,7 @@ Direction Aphid::Movement() {
 	double prob = static_cast <double> (rand()) / RAND_MAX;
 
 	if (prob < Aphid::probMove) {
-		switch ((int)round(prob*8)) {
+		switch (rand() % 8) {
 		case 0:
 			return Direction::NW;
 		case 1:

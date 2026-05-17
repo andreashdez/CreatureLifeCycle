@@ -1,8 +1,8 @@
 #
-# 'make depend' uses makedepend to automatically generate dependencies 
-#               (dependencies are added to end of Makefile)
-# 'make'        build executable file 'gol'
+# 'make'        builds executable file 'aphids_and_ladybugs'
+# 'make run'    runs the executable from this directory
 # 'make clean'  removes all .o and executable files
+# 'make depend' uses makedepend to automatically generate dependencies
 #
 
 # define the C++ compiler to use
@@ -45,10 +45,13 @@ MAIN = aphids_and_ladybugs
 # deleting dependencies appended to the file from 'make depend'
 #
 
-.PHONY: depend clean
+.PHONY: all run depend clean
 
 all:    $(MAIN)
 		@echo  Simple program named aphids_and_ladybugs has been compiled
+
+run: $(MAIN)
+		./$(MAIN)
 
 $(MAIN): $(OBJS) 
 		$(CC) $(CFLAGS) $(INCS) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)

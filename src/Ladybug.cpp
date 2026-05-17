@@ -1,5 +1,5 @@
 #include <iostream>
-#include <math.h>
+#include <cstdlib>
 #include "Location.h"
 #include "Ladybug.h"
 
@@ -9,6 +9,7 @@ using std::shared_ptr;
 
 Ladybug::Ladybug(): Creature(NULL, 15) {
 //	cout << "   [+] Constructing Ladybug" << endl;
+	ChangeDirection();
 }
 Ladybug::Ladybug(Location *location): Creature(location, 5) {
 	//cout << "   [+] Constructing Ladybug" << endl;
@@ -51,13 +52,15 @@ void Ladybug::ChangeDirection() {
 }
 
 Direction Ladybug::Movement() {
-	double prob = static_cast <double> (rand()) / RAND_MAX;
+	double probDirection = static_cast <double> (rand()) / RAND_MAX;
 	
-	if (prob < Ladybug::probDirection)
+	if (probDirection < Ladybug::probDirection)
 		ChangeDirection();
 
-	if (prob < Ladybug::probMove) {
-		switch ((int)round(prob*3)) {
+	double probMove = static_cast <double> (rand()) / RAND_MAX;
+
+	if (probMove < Ladybug::probMove) {
+		switch (rand() % 3) {
 		case 0:
 			return preferedDirection[0];
 		case 1:
