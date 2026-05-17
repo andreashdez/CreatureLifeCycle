@@ -6,7 +6,7 @@
 #include "Location.h"
 #include "Direction.h"
 
-typedef std::vector<std::shared_ptr<Creature>>::iterator IndexCreature;
+using IndexCreature = std::vector<std::shared_ptr<Creature>>::iterator;
 
 class Creature: public std::enable_shared_from_this<Creature> {
 

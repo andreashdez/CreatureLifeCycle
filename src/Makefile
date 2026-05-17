@@ -9,7 +9,7 @@
 CC = g++
 
 # define any compile-time flags
-CFLAGS = -Wall -g -std=c++11
+CFLAGS = -Wall -g -std=c++17
 
 # define any directories containing header files other than /usr/include
 INCS = -I../inc
@@ -25,7 +25,7 @@ INCS = -I../inc
 #LIBS = -lmylib -lm
 
 # define the C++ source files
-SRCS = Aphid.cpp Board.cpp Builder.cpp Creature.cpp Ladybug.cpp main.cpp
+SRCS = Aphid.cpp Board.cpp Builder.cpp Creature.cpp Ladybug.cpp Random.cpp main.cpp
 
 # define the C++ object files 
 #

@@ -4,7 +4,7 @@
 using std::cout;
 using std::endl;
 
-Creature::Creature(): location(NULL), life(0) {}
+Creature::Creature(): location(nullptr), life(0) {}
 Creature::Creature(Location *location, int life) : location(location), life(life) {}
 Creature::~Creature() {}
 
@@ -19,7 +19,7 @@ void Creature::AddToLocation(Location* newLocation) {
 }
 
 std::shared_ptr<Creature> Creature::Starvation() {
-	return NULL;
+	return nullptr;
 }
 
 Direction Creature::Movement() {
@@ -27,9 +27,9 @@ Direction Creature::Movement() {
 }
 
 std::shared_ptr<Creature> Creature::Combat() {
-	return NULL;
+	return nullptr;
 }
 
 std::shared_ptr<Creature> Creature::Procreation() {
-	return NULL;
+	return nullptr;
 }

@@ -1,13 +1,13 @@
 ﻿#include <iostream>
-#include <cstdlib>
 #include "Location.h"
 #include "Aphid.h"
+#include "Random.h"
 
 using std::cout;
 using std::endl;
 using std::shared_ptr;
 
-Aphid::Aphid(): Creature(NULL, 10) {
+Aphid::Aphid(): Creature(nullptr, 10) {
 	//cout << "   [+] Constructing Aphid" << endl;
 }
 Aphid::Aphid(Location *location): Creature(location, 2) {
@@ -23,10 +23,10 @@ void Aphid::SetProbAccomplice(double probAccomplice) { Aphid::probAccomplice = p
 void Aphid::SetProbProcreate(double probProcreate) { Aphid::probProcreate = probProcreate; }
 
 Direction Aphid::Movement() {
-	double prob = static_cast <double> (rand()) / RAND_MAX;
+	double prob = Random::Probability();
 
 	if (prob < Aphid::probMove) {
-		switch (rand() % 8) {
+		switch (Random::Int(0, 7)) {
 		case 0:
 			return Direction::NW;
 		case 1:
@@ -55,7 +55,7 @@ shared_ptr<Creature> Aphid::Combat() {
 	if (location->ladybugs.size() > 0) {
 		IndexCreature indexLadybugs = location->ladybugs.end() - 1; // More efficient to remove last element
 		double probKill = Aphid::probKill + (location->aphids.size() * Aphid::probAccomplice);
-		double prob = static_cast <double> (rand()) / RAND_MAX;
+		double prob = Random::Probability();
 
 		if (prob < probKill) {
 			shared_ptr<Creature> killed = *indexLadybugs;
@@ -64,12 +64,12 @@ shared_ptr<Creature> Aphid::Combat() {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 shared_ptr<Creature> Aphid::Procreation() {
 	if (location->aphids.size() > 1) {
-		double prob = static_cast <double> (rand()) / RAND_MAX;
+		double prob = Random::Probability();
 
 		if (prob < Aphid::probProcreate) {
 			std::shared_ptr<Creature> aphid = std::make_shared<Aphid>(location);
@@ -79,7 +79,7 @@ shared_ptr<Creature> Aphid::Procreation() {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void Aphid::UpdateLocation(Location* newLocation) {
@@ -118,5 +118,5 @@ std::shared_ptr<Creature> Aphid::Starvation() {
 		}
 		return starvedAphid;
 	}
-	return NULL;
+	return nullptr;
 }

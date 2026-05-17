@@ -1,6 +1,6 @@
 # Aphids and Ladybugs
 
-This is a small C++11 simulation of aphids and ladybugs moving around
+This is a small C++17 simulation of aphids and ladybugs moving around
 on a board and interacting with each other.
 
 ## Layout

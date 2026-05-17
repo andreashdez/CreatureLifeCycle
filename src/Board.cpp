@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "Board.h"
 #include "Creature.h"
+#include "Random.h"
 
 using std::cout;
 using std::endl;
@@ -28,7 +29,7 @@ void Board::CreateField() {
 		for (size_t j=0; j<n; j++) {
 			field[i*n+j].coordinates.x = i;
 			field[i*n+j].coordinates.y = j;
-			field[i*n+j].food = rand()%10;
+			field[i*n+j].food = Random::Int(0, 9);
 		}
 	}
 }

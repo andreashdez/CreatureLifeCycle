@@ -1,13 +1,13 @@
 #include <iostream>
-#include <cstdlib>
 #include "Location.h"
 #include "Ladybug.h"
+#include "Random.h"
 
 using std::cout;
 using std::endl;
 using std::shared_ptr;
 
-Ladybug::Ladybug(): Creature(NULL, 15) {
+Ladybug::Ladybug(): Creature(nullptr, 15) {
 //	cout << "   [+] Constructing Ladybug" << endl;
 	ChangeDirection();
 }
@@ -25,7 +25,7 @@ void Ladybug::SetProbDirection(double probDirection) { Ladybug::probDirection = 
 void Ladybug::SetProbProcreate(double probProcreate) { Ladybug::probProcreate = probProcreate; }
 
 void Ladybug::ChangeDirection() {
-	switch (rand() % 4) {
+	switch (Random::Int(0, 3)) {
 	case 0:
 		this->preferedDirection[0] = Direction::NW;
 		this->preferedDirection[1] = Direction::N;
@@ -52,15 +52,15 @@ void Ladybug::ChangeDirection() {
 }
 
 Direction Ladybug::Movement() {
-	double probDirection = static_cast <double> (rand()) / RAND_MAX;
+	double probDirection = Random::Probability();
 	
 	if (probDirection < Ladybug::probDirection)
 		ChangeDirection();
 
-	double probMove = static_cast <double> (rand()) / RAND_MAX;
+	double probMove = Random::Probability();
 
 	if (probMove < Ladybug::probMove) {
-		switch (rand() % 3) {
+		switch (Random::Int(0, 2)) {
 		case 0:
 			return preferedDirection[0];
 		case 1:
@@ -78,7 +78,7 @@ Direction Ladybug::Movement() {
 shared_ptr<Creature> Ladybug::Combat() {
 	if (location->aphids.size() > 0) {
 		IndexCreature indexAphids = location->aphids.end() - 1; // More efficient to remove last element
-		double prob = static_cast <double> (rand()) / RAND_MAX;
+		double prob = Random::Probability();
 
 		if (prob < Ladybug::probKill) {
 			shared_ptr<Creature> killed = *indexAphids;
@@ -87,12 +87,12 @@ shared_ptr<Creature> Ladybug::Combat() {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 shared_ptr<Creature> Ladybug::Procreation() {
 	if (location->ladybugs.size() > 1) {
-		double prob = static_cast <double> (rand()) / RAND_MAX;
+		double prob = Random::Probability();
 
 		if (prob < Ladybug::probProcreate) {
 			shared_ptr<Creature> ladybug = std::make_shared<Ladybug>(location);
@@ -102,7 +102,7 @@ shared_ptr<Creature> Ladybug::Procreation() {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void Ladybug::UpdateLocation(Location* newLocation) {
@@ -141,5 +141,5 @@ std::shared_ptr<Creature> Ladybug::Starvation() {
 		}
 		return starvedLadybug;
 	}
-	return NULL;
+	return nullptr;
 }
