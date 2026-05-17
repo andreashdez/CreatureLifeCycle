@@ -18,7 +18,7 @@ void Creature::AddToLocation(Location* newLocation) {
 	location = newLocation;
 }
 
-std::shared_ptr<Creature> Creature::Starvation() {
+Creature* Creature::Starvation() {
 	return nullptr;
 }
 
@@ -26,10 +26,10 @@ Direction Creature::Movement() {
 	return Direction::SAME;
 }
 
-std::shared_ptr<Creature> Creature::Combat() {
+Creature* Creature::Combat() {
 	return nullptr;
 }
 
-std::shared_ptr<Creature> Creature::Procreation() {
+std::unique_ptr<Creature> Creature::Procreation() {
 	return nullptr;
 }

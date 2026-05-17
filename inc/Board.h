@@ -12,7 +12,7 @@ private:
 	unsigned m;
 	unsigned n;
 	std::vector<Location> field;
-	std::vector<std::shared_ptr<Creature>> creatures;
+	std::vector<std::unique_ptr<Creature>> creatures;
 
 public:
 	Board();
@@ -22,14 +22,14 @@ public:
 	void SetN(unsigned);
 
 	void CreateField();
-	void AddCreature(std::shared_ptr<Creature>, unsigned, unsigned);
+	void AddCreature(std::unique_ptr<Creature>, unsigned, unsigned);
 
 	void DirectionToLocation(Direction, Coordinates&);
 	void InBoundaries(int&, int&);
-	void CreatureMovement(std::shared_ptr<Creature>&);
-	void CreatureCombat(std::shared_ptr<Creature>&, std::vector<std::shared_ptr<Creature>>&);
-	void CreatureProcreation(std::shared_ptr<Creature>&, std::vector<std::shared_ptr<Creature>>&);
-	void CreatureStarvation(std::shared_ptr<Creature>&, std::vector<std::shared_ptr<Creature>>&);
+	void CreatureMovement(Creature*);
+	void CreatureCombat(Creature*, std::vector<Creature*>&);
+	void CreatureProcreation(Creature*, std::vector<std::unique_ptr<Creature>>&);
+	void CreatureStarvation(Creature*, std::vector<Creature*>&);
 	bool Refresh();
 	void Print() const;
 

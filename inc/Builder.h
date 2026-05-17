@@ -6,10 +6,10 @@
 class Builder {
 
 public:
-	void ReadBoard(Board*&);
+	void ReadBoard(Board&);
 	void ReadAphids();
 	void ReadLadybugs();
-	void LoadStandardDate(Board*&);
+	void LoadStandardDate(Board&);
 
 };
 

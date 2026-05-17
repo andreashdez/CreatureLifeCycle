@@ -5,7 +5,6 @@
 
 using std::cout;
 using std::endl;
-using std::shared_ptr;
 
 Ladybug::Ladybug(): Creature(nullptr, 15) {
 //	cout << "   [+] Constructing Ladybug" << endl;
@@ -75,13 +74,13 @@ Direction Ladybug::Movement() {
 	return Direction::SAME;
 }
 
-shared_ptr<Creature> Ladybug::Combat() {
+Creature* Ladybug::Combat() {
 	if (location->aphids.size() > 0) {
 		IndexCreature indexAphids = location->aphids.end() - 1; // More efficient to remove last element
 		double prob = Random::Probability();
 
 		if (prob < Ladybug::probKill) {
-			shared_ptr<Creature> killed = *indexAphids;
+			Creature* killed = *indexAphids;
 			location->aphids.erase(indexAphids);
 			return killed;
 		}
@@ -90,13 +89,13 @@ shared_ptr<Creature> Ladybug::Combat() {
 	return nullptr;
 }
 
-shared_ptr<Creature> Ladybug::Procreation() {
+std::unique_ptr<Creature> Ladybug::Procreation() {
 	if (location->ladybugs.size() > 1) {
 		double prob = Random::Probability();
 
 		if (prob < Ladybug::probProcreate) {
-			shared_ptr<Creature> ladybug = std::make_shared<Ladybug>(location);
-			location->ladybugs.push_back(ladybug);
+			std::unique_ptr<Creature> ladybug = std::make_unique<Ladybug>(location);
+			location->ladybugs.push_back(ladybug.get());
 
 			return ladybug;
 		}
@@ -106,7 +105,7 @@ shared_ptr<Creature> Ladybug::Procreation() {
 }
 
 void Ladybug::UpdateLocation(Location* newLocation) {
-	shared_ptr<Creature> movingLadybug = shared_from_this();
+	Creature* movingLadybug = this;
 
 	for (IndexCreature indexLadybugs = location->ladybugs.begin(); indexLadybugs < location->ladybugs.end(); indexLadybugs++) {
 		if (movingLadybug == *indexLadybugs) {
@@ -120,18 +119,18 @@ void Ladybug::UpdateLocation(Location* newLocation) {
 }
 
 void Ladybug::AddToLocation(Location* newLocation) {
-	shared_ptr<Creature> movingLadybug = shared_from_this();
+	Creature* movingLadybug = this;
 
 	location = newLocation;
 	location->ladybugs.push_back(movingLadybug);
 }
 
-std::shared_ptr<Creature> Ladybug::Starvation() {
+Creature* Ladybug::Starvation() {
 	if (location->food > 0) {
 		++life;
 	}
 	if (--life < 1) {
-		shared_ptr<Creature> starvedLadybug = shared_from_this();
+		Creature* starvedLadybug = this;
 
 		for (IndexCreature indexLadybugs = location->ladybugs.begin(); indexLadybugs < location->ladybugs.end(); indexLadybugs++) {
 			if (starvedLadybug == *indexLadybugs) {

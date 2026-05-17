@@ -5,7 +5,6 @@
 
 using std::cout;
 using std::endl;
-using std::shared_ptr;
 
 Aphid::Aphid(): Creature(nullptr, 10) {
 	//cout << "   [+] Constructing Aphid" << endl;
@@ -51,14 +50,14 @@ Direction Aphid::Movement() {
 	return Direction::SAME;
 }
 
-shared_ptr<Creature> Aphid::Combat() {
+Creature* Aphid::Combat() {
 	if (location->ladybugs.size() > 0) {
 		IndexCreature indexLadybugs = location->ladybugs.end() - 1; // More efficient to remove last element
 		double probKill = Aphid::probKill + (location->aphids.size() * Aphid::probAccomplice);
 		double prob = Random::Probability();
 
 		if (prob < probKill) {
-			shared_ptr<Creature> killed = *indexLadybugs;
+			Creature* killed = *indexLadybugs;
 			location->ladybugs.erase(indexLadybugs);
 			return killed;
 		}
@@ -67,13 +66,13 @@ shared_ptr<Creature> Aphid::Combat() {
 	return nullptr;
 }
 
-shared_ptr<Creature> Aphid::Procreation() {
+std::unique_ptr<Creature> Aphid::Procreation() {
 	if (location->aphids.size() > 1) {
 		double prob = Random::Probability();
 
 		if (prob < Aphid::probProcreate) {
-			std::shared_ptr<Creature> aphid = std::make_shared<Aphid>(location);
-			location->aphids.push_back(aphid);
+			std::unique_ptr<Creature> aphid = std::make_unique<Aphid>(location);
+			location->aphids.push_back(aphid.get());
 
 			return aphid;
 		}
@@ -83,7 +82,7 @@ shared_ptr<Creature> Aphid::Procreation() {
 }
 
 void Aphid::UpdateLocation(Location* newLocation) {
-	shared_ptr<Creature> movingAphid = shared_from_this();
+	Creature* movingAphid = this;
 	
 	for (IndexCreature indexAphids = location->aphids.begin(); indexAphids < location->aphids.end(); indexAphids++) {
 		if (movingAphid == *indexAphids) {
@@ -97,18 +96,18 @@ void Aphid::UpdateLocation(Location* newLocation) {
 }
 
 void Aphid::AddToLocation(Location* newLocation) {
-	shared_ptr<Creature> movingLadybug = shared_from_this();
+	Creature* movingAphid = this;
 
 	location = newLocation;
-	location->aphids.push_back(movingLadybug);
+	location->aphids.push_back(movingAphid);
 }
 
-std::shared_ptr<Creature> Aphid::Starvation() {
+Creature* Aphid::Starvation() {
 	if (location->food > 0) {
 		++life;
 	}
 	if (--life < 1) {
-		shared_ptr<Creature> starvedAphid = shared_from_this();
+		Creature* starvedAphid = this;
 
 		for (IndexCreature indexAphids = location->aphids.begin(); indexAphids < location->aphids.end(); indexAphids++) {
 			if (starvedAphid == *indexAphids) {

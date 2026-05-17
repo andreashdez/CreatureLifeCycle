@@ -22,9 +22,9 @@ public:
 	static void SetProbProcreate(double);
 
 	Direction Movement();
-	std::shared_ptr<Creature> Combat();
-	std::shared_ptr<Creature> Procreation();
-	virtual std::shared_ptr<Creature> Starvation();
+	Creature* Combat();
+	std::unique_ptr<Creature> Procreation();
+	virtual Creature* Starvation();
 
 	void UpdateLocation(Location*);
 	void AddToLocation(Location*);

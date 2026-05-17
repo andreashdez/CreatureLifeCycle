@@ -6,9 +6,9 @@
 #include "Location.h"
 #include "Direction.h"
 
-using IndexCreature = std::vector<std::shared_ptr<Creature>>::iterator;
+using IndexCreature = std::vector<Creature*>::iterator;
 
-class Creature: public std::enable_shared_from_this<Creature> {
+class Creature {
 
 protected:
 	Location* location;
@@ -23,9 +23,9 @@ public:
 	Location* GetLocation();
 
 	virtual Direction Movement();
-	virtual std::shared_ptr<Creature> Combat();
-	virtual std::shared_ptr<Creature> Procreation();
-	virtual std::shared_ptr<Creature> Starvation();
+	virtual Creature* Combat();
+	virtual std::unique_ptr<Creature> Procreation();
+	virtual Creature* Starvation();
 
 	virtual void UpdateLocation(Location*);
 	virtual void AddToLocation(Location*);

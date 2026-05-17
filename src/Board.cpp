@@ -1,16 +1,16 @@
 ﻿#include <iostream>
 #include <algorithm>
+#include <utility>
 #include "Board.h"
 #include "Creature.h"
 #include "Random.h"
 
 using std::cout;
 using std::endl;
-using std::shared_ptr;
 using std::vector;
 
 namespace {
-	bool ContainsCreature(const vector<shared_ptr<Creature>> &creatures, const shared_ptr<Creature> &creature) {
+	bool ContainsCreature(const vector<Creature*> &creatures, const Creature* creature) {
 		return std::find(creatures.begin(), creatures.end(), creature) != creatures.end();
 	}
 }
@@ -34,9 +34,9 @@ void Board::CreateField() {
 	}
 }
 
-void Board::AddCreature(shared_ptr<Creature> creature, unsigned x, unsigned y) {
+void Board::AddCreature(std::unique_ptr<Creature> creature, unsigned x, unsigned y) {
 	creature->AddToLocation(&field[x*n+y]);
-	creatures.push_back(creature);
+	creatures.push_back(std::move(creature));
 }
 
 void Board::DirectionToLocation(Direction direction, Coordinates &coordinates) {
@@ -85,7 +85,7 @@ void Board::InBoundaries(int &x, int &y) {
 		y -= 2;
 }
 
-void Board::CreatureMovement(shared_ptr<Creature> &creature) {
+void Board::CreatureMovement(Creature* creature) {
 	Coordinates coordinates;
 	Direction direction;
 
@@ -97,39 +97,43 @@ void Board::CreatureMovement(shared_ptr<Creature> &creature) {
 	}
 }
 
-void Board::CreatureCombat(shared_ptr<Creature> &creature, vector<shared_ptr<Creature>> &deadCreatures) {
-	shared_ptr<Creature> killed = creature->Combat();
+void Board::CreatureCombat(Creature* creature, vector<Creature*> &deadCreatures) {
+	Creature* killed = creature->Combat();
 	if (killed) {
 		deadCreatures.push_back(killed);
 	}
 }
 
-void Board::CreatureProcreation(shared_ptr<Creature> &parentCreature, vector<shared_ptr<Creature>> &bornCreatures) {
-	shared_ptr<Creature> childCreature = parentCreature->Procreation();
+void Board::CreatureProcreation(Creature* parentCreature, vector<std::unique_ptr<Creature>> &bornCreatures) {
+	std::unique_ptr<Creature> childCreature = parentCreature->Procreation();
 
 	if (childCreature) {
-		bornCreatures.push_back(childCreature);
+		bornCreatures.push_back(std::move(childCreature));
 	}
 }
 
-void Board::CreatureStarvation(shared_ptr<Creature> &creature, vector<shared_ptr<Creature>> &deadCreatures) {
+void Board::CreatureStarvation(Creature* creature, vector<Creature*> &deadCreatures) {
 	Coordinates coordinates;
 
 	coordinates = creature->GetLocation()->coordinates;
 	field[coordinates.x*n+coordinates.y].food--;
-	shared_ptr<Creature> starved = creature->Starvation();
+	Creature* starved = creature->Starvation();
 	if (starved) {
 		deadCreatures.push_back(starved);
 	}
 }
 
 bool Board::Refresh() {
-	vector<shared_ptr<Creature>> turnCreatures = creatures;
-	vector<shared_ptr<Creature>> bornCreatures;
-	vector<shared_ptr<Creature>> deadCreatures;
+	vector<Creature*> turnCreatures;
+	vector<std::unique_ptr<Creature>> bornCreatures;
+	vector<Creature*> deadCreatures;
+
+	for (size_t i = 0; i<creatures.size(); i++) {
+		turnCreatures.push_back(creatures[i].get());
+	}
 
 	for (size_t i = 0; i<turnCreatures.size(); i++) {
-		shared_ptr<Creature> creature = turnCreatures[i];
+		Creature* creature = turnCreatures[i];
 		if (ContainsCreature(deadCreatures, creature))
 			continue;
 
@@ -140,12 +144,14 @@ bool Board::Refresh() {
 	}
 
 	for (size_t i = 0; i<bornCreatures.size(); i++) {
-		if (!ContainsCreature(deadCreatures, bornCreatures[i]))
-			creatures.push_back(bornCreatures[i]);
+		if (!ContainsCreature(deadCreatures, bornCreatures[i].get()))
+			creatures.push_back(std::move(bornCreatures[i]));
 	}
 
 	for (size_t i = 0; i<deadCreatures.size(); i++) {
-		creatures.erase(std::remove(creatures.begin(), creatures.end(), deadCreatures[i]), creatures.end());
+		creatures.erase(std::remove_if(creatures.begin(), creatures.end(), [i, &deadCreatures](const std::unique_ptr<Creature> &creature) {
+			return creature.get() == deadCreatures[i];
+		}), creatures.end());
 	}
 
 	return creatures.empty();
