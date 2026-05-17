@@ -1,35 +1,40 @@
 ﻿#include <iostream>
+#include <algorithm>
 #include "Board.h"
 #include "Creature.h"
 
 using std::cout;
 using std::endl;
 using std::shared_ptr;
+using std::vector;
 
-Board::Board(): m(0), n(0), field(NULL) {}
-Board::~Board() {
-	for (size_t i=0; i<m*n; i++)
-		delete field[i];
+namespace {
+	bool ContainsCreature(const vector<shared_ptr<Creature>> &creatures, const shared_ptr<Creature> &creature) {
+		return std::find(creatures.begin(), creatures.end(), creature) != creatures.end();
+	}
 }
+
+Board::Board(): m(0), n(0) {}
+Board::~Board() {}
 
 void Board::SetM(unsigned m) { this->m = m; }
 void Board::SetN(unsigned n) { this->n = n; }
 
 void Board::CreateField() {
-	field = new Location*[m*n];
+	field.clear();
+	field.resize(m*n);
 
 	for (size_t i=0; i<m; i++) {
 		for (size_t j=0; j<n; j++) {
-			field[i*n+j] = new Location;
-			field[i*n+j]->coordinates.x = i;
-			field[i*n+j]->coordinates.y = j;
-			field[i*n+j]->food = rand()%10;
+			field[i*n+j].coordinates.x = i;
+			field[i*n+j].coordinates.y = j;
+			field[i*n+j].food = rand()%10;
 		}
 	}
 }
 
 void Board::AddCreature(shared_ptr<Creature> creature, unsigned x, unsigned y) {
-	creature->AddToLocation(field[x*n+y]);
+	creature->AddToLocation(&field[x*n+y]);
 	creatures.push_back(creature);
 }
 
@@ -87,58 +92,59 @@ void Board::CreatureMovement(shared_ptr<Creature> &creature) {
 	direction = creature->Movement();
 	if (direction != Direction::SAME) {
 		DirectionToLocation(direction, coordinates);
-		creature->UpdateLocation(field[coordinates.x*n+coordinates.y]);
+		creature->UpdateLocation(&field[coordinates.x*n+coordinates.y]);
 	}
 }
 
-void Board::CreatureCombat(shared_ptr<Creature> &creature) {
-	Coordinates coordinates;
-
-	coordinates = creature->GetLocation()->coordinates;
+void Board::CreatureCombat(shared_ptr<Creature> &creature, vector<shared_ptr<Creature>> &deadCreatures) {
 	shared_ptr<Creature> killed = creature->Combat();
 	if (killed) {
-		for (size_t i = 0; i<creatures.size(); i++) {
-			if (creatures[i] == killed) {
-				creatures.erase(creatures.begin() + i);
-				killed.reset();
-				break;
-			}
-		}
+		deadCreatures.push_back(killed);
 	}
 }
 
-void Board::CreatureProcreation(shared_ptr<Creature> &parentCreature) {
+void Board::CreatureProcreation(shared_ptr<Creature> &parentCreature, vector<shared_ptr<Creature>> &bornCreatures) {
 	shared_ptr<Creature> childCreature = parentCreature->Procreation();
 
 	if (childCreature) {
-		creatures.push_back(childCreature);
+		bornCreatures.push_back(childCreature);
 	}
 }
 
-void Board::CreatureStarvation(shared_ptr<Creature> &creature) {
+void Board::CreatureStarvation(shared_ptr<Creature> &creature, vector<shared_ptr<Creature>> &deadCreatures) {
 	Coordinates coordinates;
 
 	coordinates = creature->GetLocation()->coordinates;
-	field[coordinates.x*n+coordinates.y]->food--;
+	field[coordinates.x*n+coordinates.y].food--;
 	shared_ptr<Creature> starved = creature->Starvation();
 	if (starved) {
-		for (size_t i = 0; i<creatures.size(); i++) {
-			if (creatures[i] == starved) {
-				creatures.erase(creatures.begin() + i);
-				starved.reset();
-				break;
-			}
-		}
+		deadCreatures.push_back(starved);
 	}
 }
 
 bool Board::Refresh() {
-	for (size_t i = 0; i<creatures.size(); i++) {
-		shared_ptr<Creature> creature = creatures[i];
+	vector<shared_ptr<Creature>> turnCreatures = creatures;
+	vector<shared_ptr<Creature>> bornCreatures;
+	vector<shared_ptr<Creature>> deadCreatures;
+
+	for (size_t i = 0; i<turnCreatures.size(); i++) {
+		shared_ptr<Creature> creature = turnCreatures[i];
+		if (ContainsCreature(deadCreatures, creature))
+			continue;
+
 		CreatureMovement(creature);
-		CreatureCombat(creature);
-		CreatureProcreation(creature);
-		CreatureStarvation(creature);
+		CreatureCombat(creature, deadCreatures);
+		CreatureProcreation(creature, bornCreatures);
+		CreatureStarvation(creature, deadCreatures);
+	}
+
+	for (size_t i = 0; i<bornCreatures.size(); i++) {
+		if (!ContainsCreature(deadCreatures, bornCreatures[i]))
+			creatures.push_back(bornCreatures[i]);
+	}
+
+	for (size_t i = 0; i<deadCreatures.size(); i++) {
+		creatures.erase(std::remove(creatures.begin(), creatures.end(), deadCreatures[i]), creatures.end());
 	}
 
 	return creatures.empty();
@@ -148,20 +154,22 @@ void Board::Print() const {
 	cout << endl;
 	for (size_t i=0; i<m; i++) {
 		for (size_t j=0; j<n; j++) {
-			cout << " ";
-			if (field[i*n+j]->aphids.size() == 0)
-				cout << "_";
-			else if (field[i*n+j]->aphids.size() > 9)
-				cout << "~";
-			else
-				cout << field[i*n+j]->aphids.size();
+			const Location &location = field[i*n+j];
 
-			if (field[i*n+j]->ladybugs.size() == 0)
+			cout << " ";
+			if (location.aphids.size() == 0)
 				cout << "_";
-			else if (field[i*n+j]->ladybugs.size() > 9)
+			else if (location.aphids.size() > 9)
 				cout << "~";
 			else
-				cout << field[i*n+j]->ladybugs.size();
+				cout << location.aphids.size();
+
+			if (location.ladybugs.size() == 0)
+				cout << "_";
+			else if (location.ladybugs.size() > 9)
+				cout << "~";
+			else
+				cout << location.ladybugs.size();
 		}
 		cout << endl;
 	}
